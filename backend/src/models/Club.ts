@@ -5,8 +5,10 @@ export interface IClub extends Document {
   description: string;
   admin: mongoose.Types.ObjectId;
   members: mongoose.Types.ObjectId[];
+  mainPhoto?: string;
   photos: string[];
   eventsCount: number;
+  pendingMembers?: mongoose.Types.ObjectId[];
   createdAt: Date;
 }
 
@@ -16,7 +18,9 @@ const ClubSchema = new Schema<IClub>(
     description: { type: String, required: true },
     admin: { type: Schema.Types.ObjectId, ref: "User", required: true },
     members: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    mainPhoto: { type: String },
     photos: [{ type: String }],
+    pendingMembers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     eventsCount: { type: Number, default: 0 },
   },
   { timestamps: true }

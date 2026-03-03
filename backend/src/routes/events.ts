@@ -1,4 +1,5 @@
 import express from "express";
+import { checkInWithQR } from "../controllers/events";
 import {
   getAllEvents,
   getEventById,
@@ -8,6 +9,9 @@ import {
   deleteEvent,
   registerForEvent,
   getUserRegistrations,
+  addPhotoToEvent,
+  setMainPhotoEvent,
+  removePhotoFromEvent,
 } from "../controllers/events";
 import authMiddleware from "../middleware/auth";
 
@@ -21,5 +25,9 @@ router.get("/:id", getEventById);
 router.put("/:id", authMiddleware, updateEvent);
 router.delete("/:id", authMiddleware, deleteEvent);
 router.post("/:id/register", authMiddleware, registerForEvent);
+router.post("/:id/photos", authMiddleware, addPhotoToEvent);
+router.post("/:id/set-main-photo", authMiddleware, setMainPhotoEvent);
+router.delete("/:id/photos", authMiddleware, removePhotoFromEvent);
+router.post("/events/checkin", authMiddleware, checkInWithQR);
 
 export default router;

@@ -1,5 +1,6 @@
 import { Response } from "express";
 import Club from "../models/Club";
+import ClubJoinRequest from "../models/ClubJoinRequest";
 import { AuthRequest } from "../middleware/auth";
 
 // Get all clubs
@@ -102,7 +103,7 @@ export const deleteClub = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Join club
+// Join club (creates a pending request)
 export const joinClub = async (req: AuthRequest, res: Response) => {
   try {
     const club = await Club.findById(req.params.id);
@@ -115,10 +116,36 @@ export const joinClub = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: "Already a member of this club" });
     }
 
-    club.members.push(req.user?.id as any);
+    // Check if already has a pending request
+    const existingRequest = await ClubJoinRequest.findOne({
+      userId: req.user?.id,
+      clubId: club._id,
+      status: "pending",
+    });
+
+    if (existingRequest) {
+      return res.status(400).json({ error: "You already have a pending join request" });
+    }
+
+    // Create a join request
+    const joinRequest = new ClubJoinRequest({
+      userId: req.user?.id,
+      clubId: club._id,
+      status: "pending",
+    });
+
+    await joinRequest.save();
+
+    // Add to pending members
+    if (!club.pendingMembers) {
+      club.pendingMembers = [];
+    }
+    if (!club.pendingMembers.includes(req.user?.id as any)) {
+      club.pendingMembers.push(req.user?.id as any);
+    }
     await club.save();
 
-    res.json({ message: "Successfully joined club", club });
+    res.json({ message: "Join request created. Waiting for admin approval", joinRequest });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
@@ -158,7 +185,7 @@ export const addPhotoToClub = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: "Only club admin can add photos" });
     }
 
-    const { photoUrl } = req.body;
+    const { photoUrl, isMainPhoto } = req.body;
     if (!photoUrl) {
       return res.status(400).json({ error: "Photo URL is required" });
     }
@@ -167,7 +194,45 @@ export const addPhotoToClub = async (req: AuthRequest, res: Response) => {
       club.photos = [];
     }
 
-    club.photos.push(photoUrl);
+    if (isMainPhoto) {
+      club.mainPhoto = photoUrl;
+    }
+
+    if (!club.photos.includes(photoUrl)) {
+      club.photos.push(photoUrl);
+    }
+    await club.save();
+    await club.populate("admin", "name email");
+
+    res.json(club);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+// Set main photo for club
+export const setMainPhotoClub = async (req: AuthRequest, res: Response) => {
+  try {
+    const club = await Club.findById(req.params.id);
+
+    if (!club) {
+      return res.status(404).json({ error: "Club not found" });
+    }
+
+    if (club.admin.toString() !== req.user?.id) {
+      return res.status(403).json({ error: "Only club admin can set main photo" });
+    }
+
+    const { photoUrl } = req.body;
+    if (!photoUrl) {
+      return res.status(400).json({ error: "Photo URL is required" });
+    }
+
+    if (!club.photos.includes(photoUrl)) {
+      return res.status(400).json({ error: "Photo not found in club photos" });
+    }
+
+    club.mainPhoto = photoUrl;
     await club.save();
     await club.populate("admin", "name email");
 
