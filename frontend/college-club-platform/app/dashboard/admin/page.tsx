@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import StatCard from "@/components/dashboard/StatCard";
 import EventCard from "@/components/dashboard/EventCard";
@@ -79,6 +80,12 @@ export default function AdminDashboard() {
           <button className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
             + Create Event
           </button>
+
+           <Link href="/dashboard/admin/scan">
+      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+        Scan QR
+      </button>
+    </Link>
         </div>
 
         {error && (
