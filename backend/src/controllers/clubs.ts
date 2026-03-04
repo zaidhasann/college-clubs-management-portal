@@ -74,6 +74,24 @@ export const updateClub = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: "Not authorized to update this club" });
     }
 
+    // Detect removed members and clean up their join requests
+    if (req.body.members) {
+      const oldMemberIds = club.members.map((m: any) => m.toString());
+      const newMemberIds = req.body.members.map((m: any) =>
+        typeof m === "string" ? m : m._id?.toString() || m.toString()
+      );
+      const removedIds = oldMemberIds.filter(
+        (id: string) => !newMemberIds.includes(id)
+      );
+
+      if (removedIds.length > 0) {
+        await ClubJoinRequest.deleteMany({
+          userId: { $in: removedIds },
+          clubId: club._id,
+        });
+      }
+    }
+
     Object.assign(club, req.body);
     await club.save();
 
@@ -116,18 +134,51 @@ export const joinClub = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: "Already a member of this club" });
     }
 
-    // Check if already has a pending request
+    // Check if a request already exists for this user + club
     const existingRequest = await ClubJoinRequest.findOne({
       userId: req.user?.id,
       clubId: club._id,
-      status: "pending",
     });
 
     if (existingRequest) {
-      return res.status(400).json({ error: "You already have a pending join request" });
+      if (existingRequest.status === "pending") {
+        return res.status(400).json({ error: "You already have a pending join request" });
+      }
+      if (existingRequest.status === "approved") {
+        // User was approved before but no longer a member — they were removed
+        // Reset the request so they can re-join
+        existingRequest.status = "pending";
+        existingRequest.requestedAt = new Date();
+        existingRequest.approvedAt = undefined;
+        existingRequest.approvedBy = undefined;
+        await existingRequest.save();
+
+        if (!club.pendingMembers) club.pendingMembers = [];
+        if (!club.pendingMembers.includes(req.user?.id as any)) {
+          club.pendingMembers.push(req.user?.id as any);
+        }
+        await club.save();
+
+        return res.json({ message: "Join request re-submitted. Waiting for admin approval", joinRequest: existingRequest });
+      }
+      // If rejected, reset it to pending so the user can re-apply
+      existingRequest.status = "pending";
+      existingRequest.requestedAt = new Date();
+      existingRequest.approvedAt = undefined;
+      existingRequest.approvedBy = undefined;
+      await existingRequest.save();
+
+      // Add to pending members
+      if (!club.pendingMembers) club.pendingMembers = [];
+      if (!club.pendingMembers.includes(req.user?.id as any)) {
+        club.pendingMembers.push(req.user?.id as any);
+      }
+      await club.save();
+
+      return res.json({ message: "Join request re-submitted. Waiting for admin approval", joinRequest: existingRequest });
     }
 
-    // Create a join request
+    // Create a brand-new join request
     const joinRequest = new ClubJoinRequest({
       userId: req.user?.id,
       clubId: club._id,

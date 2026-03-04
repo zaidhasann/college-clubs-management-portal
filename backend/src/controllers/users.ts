@@ -1,5 +1,8 @@
 import { Response } from "express";
 import User from "../models/User";
+import Club from "../models/Club";
+import Registration from "../models/Registration";
+import ClubJoinRequest from "../models/ClubJoinRequest";
 import { AuthRequest } from "../middleware/auth";
 
 // Get all users (admin only)
@@ -95,6 +98,21 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    // Cascade: remove all related data for this user
+    await ClubJoinRequest.deleteMany({ userId });
+    await Registration.deleteMany({ user: userId });
+
+    // Remove user from any club member lists
+    await Club.updateMany(
+      { "members._id": userId },
+      { $pull: { members: { _id: userId } } }
+    );
+    // Also handle if members are stored as ObjectIds
+    await Club.updateMany(
+      { members: userId },
+      { $pull: { members: userId } }
+    );
 
     res.json({ message: "User deleted successfully" });
   } catch (error) {

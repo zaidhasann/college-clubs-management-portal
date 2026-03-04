@@ -28,6 +28,6 @@ router.post("/:id/register", authMiddleware, registerForEvent);
 router.post("/:id/photos", authMiddleware, addPhotoToEvent);
 router.post("/:id/set-main-photo", authMiddleware, setMainPhotoEvent);
 router.delete("/:id/photos", authMiddleware, removePhotoFromEvent);
-router.post("/events/checkin", authMiddleware, checkInWithQR);
+router.post("/checkin", authMiddleware, checkInWithQR);
 
 export default router;

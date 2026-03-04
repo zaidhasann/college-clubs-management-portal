@@ -21,7 +21,7 @@ const ClubJoinRequestSchema = new Schema<IClubJoinRequest>(
   { timestamps: true }
 );
 
-// Ensure one user can only have one pending request per club
-ClubJoinRequestSchema.index({ userId: 1, clubId: 1, status: 1 }, { unique: true, sparse: true });
+// Ensure one request per user per club (any status)
+ClubJoinRequestSchema.index({ userId: 1, clubId: 1 }, { unique: true });
 
 export default mongoose.model<IClubJoinRequest>("ClubJoinRequest", ClubJoinRequestSchema);
