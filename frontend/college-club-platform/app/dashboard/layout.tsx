@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { usersAPI, clubsAPI, clubJoinRequestAPI } from "@/lib/api";
+import SearchBar from "@/components/layout/SearchBar";
 
 export default function DashboardLayout({
   children,
@@ -178,9 +179,12 @@ export default function DashboardLayout({
           </button>
 
           {/* Dashboard Title */}
-          <h2 className="text-sm sm:text-lg font-semibold flex-1">
+          <h2 className="text-sm sm:text-lg font-semibold hidden sm:block">
             {user?.role === "admin" ? "Admin" : "Member"}
           </h2>
+
+          {/* Search Bar */}
+          <SearchBar />
 
           {/* User Info */}
           <div className="flex items-center gap-2 sm:gap-4">

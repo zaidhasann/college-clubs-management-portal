@@ -172,13 +172,17 @@ const registration = new Registration({
   event: req.params.id,
   status: "registered",
   qrCode: qrToken,
+  paymentStatus: event.isPaid ? "pending" : "not_required",
 });
     await registration.save();
 
-    // Update event
-    event.participants.push(req.user?.id as any);
-    event.registrationsCount += 1;
-    await event.save();
+    // For free events, add participant immediately
+    // For paid events, participant is added after payment verification
+    if (!event.isPaid) {
+      event.participants.push(req.user?.id as any);
+      event.registrationsCount += 1;
+      await event.save();
+    }
 
     res.status(201).json({ message: "Successfully registered for event", registration });
   } catch (error) {

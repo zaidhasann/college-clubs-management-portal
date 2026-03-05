@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useMemberRoute } from "@/hooks/useProtectedRoute";
-import { eventsAPI } from "@/lib/api";
+import { eventsAPI, paymentAPI } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -62,21 +62,96 @@ setRegisteredEvents(registeredIds);
     }
   }, [loading]);
 
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (document.getElementById("razorpay-script")) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = "razorpay-script";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handleRegisterEvent = async (eventId: string) => {
+    const event = events.find((e) => e._id === eventId);
+    if (!event) return;
+
+    setError("");
+    setSuccess("");
+    setRegistering(eventId);
+
     try {
-      setError("");
-      setSuccess("");
-      setRegistering(eventId);
+      // FREE event — register directly
+      if (!event.isPaid || event.price <= 0) {
+        await eventsAPI.register(eventId);
+        setRegisteredEvents([...registeredEvents, eventId]);
+        setSuccess("Successfully registered for event!");
+        const data = await eventsAPI.getAll();
+        setEvents(data);
+        setTimeout(() => setSuccess(""), 3000);
+        return;
+      }
 
-      await eventsAPI.register(eventId);
-      setRegisteredEvents([...registeredEvents, eventId]);
-      setSuccess("Successfully registered for event!");
+      // PAID event — Razorpay flow
+      const loaded = await loadRazorpayScript();
+      if (!loaded) {
+        setError("Failed to load payment gateway. Please try again.");
+        return;
+      }
 
-      // Refresh events
-      const data = await eventsAPI.getAll();
-      setEvents(data);
+      // 1. Create order on backend
+      const orderData = await paymentAPI.createOrder(eventId);
 
-      setTimeout(() => setSuccess(""), 3000);
+      // 2. Open Razorpay checkout
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Clubमंच",
+        description: `Registration: ${orderData.eventTitle}`,
+        order_id: orderData.orderId,
+        handler: async (response: any) => {
+          try {
+            // 3. Verify payment on backend
+            await paymentAPI.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            setRegisteredEvents([...registeredEvents, eventId]);
+            setSuccess("Payment successful! You are registered.");
+            const data = await eventsAPI.getAll();
+            setEvents(data);
+            setTimeout(() => setSuccess(""), 5000);
+          } catch (err) {
+            setError((err as Error).message || "Payment verification failed");
+          }
+        },
+        prefill: {
+          name: user?.name || "",
+          email: user?.email || "",
+        },
+        theme: {
+          color: "#3b82f6",
+        },
+        modal: {
+          ondismiss: () => {
+            setRegistering(null);
+          },
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on("payment.failed", (response: any) => {
+        setError(`Payment failed: ${response.error.description}`);
+      });
+      rzp.open();
     } catch (err) {
       setError((err as Error).message || "Failed to register");
     } finally {
@@ -219,9 +294,9 @@ setRegisteredEvents(registeredIds);
                         className="w-full text-xs sm:text-sm"
                       >
                         {registering === event._id
-                          ? "Registering..."
+                          ? (event.isPaid ? "Processing Payment..." : "Registering...")
                           : event.isPaid
-                          ? `Register - ₹${event.price.toFixed(2)}`
+                          ? `Pay & Register - ₹${event.price.toFixed(2)}`
                           : "Register for Free"}
                       </Button>
                     )}

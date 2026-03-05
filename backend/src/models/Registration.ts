@@ -6,10 +6,17 @@ export interface IRegistration extends Document {
   status: "registered" | "attended" | "cancelled";
   registeredAt: Date;
 
-  // ✅ QR system fields
+  // QR system fields
   qrCode: string;
   isCheckedIn: boolean;
   checkedInAt?: Date;
+
+  // Payment fields
+  paymentStatus: "not_required" | "pending" | "paid" | "failed";
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  amountPaid?: number;
+  paidAt?: Date;
 }
 
 const RegistrationSchema = new Schema<IRegistration>(
@@ -38,10 +45,21 @@ const RegistrationSchema = new Schema<IRegistration>(
       default: false,
     },
 
-    // ✅ Store time of entry
+    // Store time of entry
     checkedInAt: {
       type: Date,
     },
+
+    // Payment fields
+    paymentStatus: {
+      type: String,
+      enum: ["not_required", "pending", "paid", "failed"],
+      default: "not_required",
+    },
+    razorpayOrderId: { type: String },
+    razorpayPaymentId: { type: String },
+    amountPaid: { type: Number },
+    paidAt: { type: Date },
   },
   { timestamps: true }
 );

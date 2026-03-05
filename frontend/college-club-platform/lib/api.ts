@@ -182,3 +182,20 @@ export const clubJoinRequestAPI = {
       method: "POST",
     }),
 };
+
+// Payment API (Razorpay)
+export const paymentAPI = {
+  createOrder: (eventId: string) =>
+    apiRequest(`/payments/order/${eventId}`, {
+      method: "POST",
+    }),
+  verifyPayment: (data: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) =>
+    apiRequest("/payments/verify", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};

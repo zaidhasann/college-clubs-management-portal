@@ -26,7 +26,7 @@ const EventSchema = new Schema<IEvent>(
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     price: { type: Number, default: 0 },
     isPaid: { type: Boolean, default: false },
-    capacity: { type: Number, required: true },
+    capacity: { type: Number, default: 0 },
     status: { type: String, enum: ["upcoming", "completed"], default: "upcoming" },
     registrationsCount: { type: Number, default: 0 },
     participants: [{ type: Schema.Types.ObjectId, ref: "User" }],

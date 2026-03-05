@@ -7,6 +7,7 @@ import clubRoutes from "./routes/clubs";
 import eventRoutes from "./routes/events";
 import userRoutes from "./routes/users";
 import adminRequestRoutes from "./routes/adminRequest";
+import paymentRoutes from "./routes/payment";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use("/api/admin-requests", adminRequestRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/clubs", clubRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Start server and connect to database
 const startServer = async () => {
