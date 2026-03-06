@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import StatCard from "@/components/dashboard/StatCard";
 import EventCard from "@/components/dashboard/EventCard";
 import { useAdminRoute } from "@/hooks/useProtectedRoute";
-import { eventsAPI } from "@/lib/api";
+import { eventsAPI, usersAPI } from "@/lib/api";
 import { Event } from "@/types/index";
 
 export default function AdminDashboard() {
@@ -13,6 +13,7 @@ export default function AdminDashboard() {
   const [events, setEvents] = useState<Event[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [totalMembers, setTotalMembers] = useState(0);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -27,8 +28,18 @@ export default function AdminDashboard() {
       }
     };
 
+    const fetchMembers = async () => {
+      try {
+        const users = await usersAPI.getAll();
+        setTotalMembers(users.length);
+      } catch (err) {
+        console.error("Failed to fetch members:", err);
+      }
+    };
+
     if (!loading) {
       fetchEvents();
+      fetchMembers();
     }
   }, [loading]);
 
@@ -36,13 +47,12 @@ export default function AdminDashboard() {
     return <div className="text-center py-12">Loading...</div>;
   }
 
-  const totalMembers = 320; // TODO: Fetch from API
   const totalEvents = events.length;
   const activeEvents = events.filter(
     (event) => event.status === "upcoming"
   ).length;
   const totalRegistrations = events.reduce(
-    (acc, event) => acc + event.registrationsCount,
+    (acc, event) => acc + (event.registrationsCount || 0),
     0
   );
 
@@ -52,8 +62,8 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Members"
-          value={totalMembers.toString()}
-          subtitle="Active students"
+          value={totalMembers_count.toString()}
+          subtitle="Registered users"
         />
         <StatCard
           title="Total Events"
@@ -77,9 +87,9 @@ export default function AdminDashboard() {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">Recent Events</h3>
 
-          <button className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+          <Link href="/dashboard/admin/events" className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
             + Create Event
-          </button>
+          </Link>
 
            <Link href="/dashboard/admin/scan">
       <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">

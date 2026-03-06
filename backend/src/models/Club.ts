@@ -9,6 +9,8 @@ export interface IClub extends Document {
   photos: string[];
   eventsCount: number;
   pendingMembers?: mongoose.Types.ObjectId[];
+  chatMode: "open" | "admin_only";
+  pinnedMessage?: mongoose.Types.ObjectId;
   createdAt: Date;
 }
 
@@ -22,6 +24,8 @@ const ClubSchema = new Schema<IClub>(
     photos: [{ type: String }],
     pendingMembers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     eventsCount: { type: Number, default: 0 },
+    chatMode: { type: String, enum: ["open", "admin_only"], default: "open" },
+    pinnedMessage: { type: Schema.Types.ObjectId, ref: "Message", default: null },
   },
   { timestamps: true }
 );

@@ -470,7 +470,7 @@ export default function AdminEventsPage() {
           ctaAction={!showForm ? () => setShowForm(true) : undefined}
         />
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {events.map((event) => {
             const eventDate = new Date(event.date);
             const deadlineDate = new Date(event.deadline);
@@ -478,12 +478,12 @@ export default function AdminEventsPage() {
             const deadlinePassed = now > deadlineDate;
 
             return (
-              <Card key={event._id}>
-                <div className="space-y-4">
-                  {/* Main Photo Display */}
+              <Card key={event._id} className="h-full">
+                <div className="flex flex-col h-full">
+                  {/* Main Photo */}
                   {event.mainPhoto && (
                     <div
-                      className="relative w-full h-48 rounded-lg overflow-hidden bg-zinc-800 cursor-pointer group/photo"
+                      className="relative w-full h-44 rounded-lg overflow-hidden bg-zinc-800 mb-3 cursor-pointer group/photo"
                       onClick={() => {
                         setSelectedEventForGallery(event);
                         setGalleryOpen(true);
@@ -508,64 +508,57 @@ export default function AdminEventsPage() {
                     </div>
                   )}
 
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-bold">{event.title}</h3>
-                          {event.isPaid && (
-                            <Badge variant="info">
-                              💰 ₹{event.price.toFixed(2)}
-                            </Badge>
-                          )}
-                          {deadlinePassed && (
-                            <Badge variant="warning">Registration Closed</Badge>
-                          )}
-                        </div>
-                        <p className="text-zinc-300 text-sm mb-3">
-                          {event.description}
-                        </p>
-                      </div>
-                    </div>
+                  {/* Title & Badges */}
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <h3 className="text-base font-bold truncate">{event.title}</h3>
+                    {event.isPaid && (
+                      <Badge variant="info">💰 ₹{event.price.toFixed(2)}</Badge>
+                    )}
+                    {deadlinePassed && (
+                      <Badge variant="warning">Closed</Badge>
+                    )}
+                  </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-                    <div>
-                      <p className="text-zinc-400">Event Date</p>
+                  {/* Description */}
+                  <p className="text-zinc-300 text-xs mb-3 line-clamp-2">
+                    {event.description}
+                  </p>
+
+                  {/* Info Grid */}
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                    <div className="bg-zinc-800/50 rounded-lg p-2">
+                      <p className="text-zinc-500">Event Date</p>
                       <p className="text-white font-semibold">
                         {eventDate.toLocaleDateString()}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-zinc-400">Deadline</p>
+                    <div className="bg-zinc-800/50 rounded-lg p-2">
+                      <p className="text-zinc-500">Deadline</p>
                       <p className="text-white font-semibold">
                         {deadlineDate.toLocaleDateString()}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-zinc-400">Registrations</p>
+                    <div className="bg-zinc-800/50 rounded-lg p-2">
+                      <p className="text-zinc-500">Capacity</p>
                       <p className="text-white font-semibold">
-                        {event.participants.length}
+                        {event.participants.length} / {event.capacity || 0}
                       </p>
                     </div>
-                    <div>
-  <p className="text-zinc-400">Capacity</p>
-  <p className="text-white font-semibold">
-    {event.participants.length} / {event.capacity || 0}
-  </p>
-</div>
-                    <div>
-                      <p className="text-zinc-400">Status</p>
-                      <p className="text-white font-semibold">
+                    <div className="bg-zinc-800/50 rounded-lg p-2">
+                      <p className="text-zinc-500">Status</p>
+                      <p className={`font-semibold ${deadlinePassed ? "text-red-400" : "text-green-400"}`}>
                         {deadlinePassed ? "Closed" : "Open"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* Action Buttons - pushed to bottom */}
+                  <div className="mt-auto flex gap-2">
                     <Button
                       size="sm"
                       variant="secondary"
                       onClick={() => handleEditEvent(event)}
-                      className="flex-1"
+                      className="flex-1 text-xs"
                     >
                       Edit
                     </Button>
@@ -576,7 +569,7 @@ export default function AdminEventsPage() {
                         setSelectedEventId(event._id);
                         setShowPhotoForm(true);
                       }}
-                      className="flex-1"
+                      className="flex-1 text-xs"
                     >
                       Add Photo
                     </Button>
@@ -584,25 +577,25 @@ export default function AdminEventsPage() {
                       size="sm"
                       variant="danger"
                       onClick={() => handleDeleteEvent(event._id)}
-                      className="flex-1"
+                      className="flex-1 text-xs"
                     >
                       Delete
                     </Button>
                   </div>
 
-                  {/* Photos Section */}
+                  {/* Photos Thumbnails */}
                   {event.photos && event.photos.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2 text-sm text-zinc-300">
+                    <div className="mt-3 pt-3 border-t border-zinc-800">
+                      <h4 className="font-semibold mb-2 text-[11px] text-zinc-400 uppercase tracking-wider">
                         Photos ({event.photos.length})
                       </h4>
-                      <div className="grid grid-cols-4 gap-2">
-                        {event.photos.map((photo, idx) => (
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {event.photos.slice(0, 4).map((photo, idx) => (
                           <div key={idx} className="relative group">
                             <img
                               src={photo}
                               alt={`Event photo ${idx + 1}`}
-                              className="w-full h-20 object-cover rounded border border-white/10"
+                              className="w-full h-16 object-cover rounded border border-white/10"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src =
                                   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23404040' width='100' height='100'/%3E%3Ctext x='50' y='50' font-size='8' fill='%23999' text-anchor='middle' dy='.3em'%3ENot found%3C/text%3E%3C/svg%3E";
@@ -615,11 +608,14 @@ export default function AdminEventsPage() {
                               className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/50 transition flex items-center justify-center opacity-0 group-hover:opacity-100 rounded"
                               title="Remove photo"
                             >
-                              <span className="text-white font-bold">✕</span>
+                              <span className="text-white font-bold text-xs">✕</span>
                             </button>
                           </div>
                         ))}
                       </div>
+                      {event.photos.length > 4 && (
+                        <p className="text-[10px] text-zinc-500 mt-1 text-center">+{event.photos.length - 4} more</p>
+                      )}
                     </div>
                   )}
                 </div>

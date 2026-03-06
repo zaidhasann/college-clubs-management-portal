@@ -199,3 +199,26 @@ export const paymentAPI = {
       body: JSON.stringify(data),
     }),
 };
+
+// Chat API
+export const chatAPI = {
+  getMessages: (clubId: string, page?: number) =>
+    apiRequest(`/chat/${clubId}/messages${page ? `?page=${page}` : ""}`),
+  getSettings: (clubId: string) =>
+    apiRequest(`/chat/${clubId}/settings`),
+  updateSettings: (clubId: string, chatMode: "open" | "admin_only") =>
+    apiRequest(`/chat/${clubId}/settings`, {
+      method: "PUT",
+      body: JSON.stringify({ chatMode }),
+    }),
+  getPinnedMessage: (clubId: string) =>
+    apiRequest(`/chat/${clubId}/pin`),
+  pinMessage: (clubId: string, messageId: string) =>
+    apiRequest(`/chat/${clubId}/pin/${messageId}`, {
+      method: "POST",
+    }),
+  unpinMessage: (clubId: string) =>
+    apiRequest(`/chat/${clubId}/pin`, {
+      method: "DELETE",
+    }),
+};

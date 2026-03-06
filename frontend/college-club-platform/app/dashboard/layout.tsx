@@ -28,6 +28,7 @@ export default function DashboardLayout({
     { name: "Users", href: "/dashboard/admin/users", icon: "👥" },
     { name: "Clubs", href: "/dashboard/admin/clubs", icon: "🏢" },
     { name: "Events", href: "/dashboard/admin/events", icon: "📅" },
+    { name: "Chat", href: "/dashboard/admin/chat", icon: "💬" },
     { name: "Settings", href: "/dashboard/admin/settings", icon: "⚙️" },
   ];
 
@@ -35,6 +36,7 @@ export default function DashboardLayout({
     { name: "Dashboard", href: "/dashboard/member", icon: "📊" },
     { name: "Clubs", href: "/dashboard/member/clubs", icon: "🏢" },
     { name: "Events", href: "/dashboard/member/events", icon: "📅" },
+    { name: "Chat", href: "/dashboard/member/chat", icon: "💬" },
     { name: "My Registrations", href: "/dashboard/member/my-registrations", icon: "📋" },
   ];
 

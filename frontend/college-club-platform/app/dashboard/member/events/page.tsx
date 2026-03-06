@@ -188,7 +188,7 @@ setRegisteredEvents(registeredIds);
           <p className="text-sm sm:text-base text-zinc-300">No events available yet</p>
         </Card>
       ) : (
-        <div className="space-y-3 sm:space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {events.map((event) => {
             const eventDate = new Date(event.date);
             const deadlineDate = new Date(event.deadline);
@@ -199,17 +199,17 @@ setRegisteredEvents(registeredIds);
             return (
               <div
                 key={event?._id}
-                className="group hover:bg-blue-400/60 cursor-pointer transition-all duration-300 ease-out"
+                className="group cursor-pointer transition-all duration-300 ease-out"
                 onClick={() => setSelectedEvent(event)}
               >
                 <Card
-                  className="group-hover:bg-white/20 group-hover:border-blue-400/60 transition-all duration-300 ease-out backdrop-blur-xl border-white/30 shadow-xl hover:shadow-2xl"
+                  className="h-full group-hover:bg-white/20 group-hover:border-blue-400/60 transition-all duration-300 ease-out backdrop-blur-xl border-white/30 shadow-xl hover:shadow-2xl"
                 >
-                  <div className="space-y-3 sm:space-y-4">
-                    {/* Main Photo Display */}
+                  <div className="flex flex-col h-full">
+                    {/* Main Photo */}
                     {event.mainPhoto && (
                       <div
-                        className="relative w-full h-40 sm:h-48 rounded-lg overflow-hidden bg-zinc-800 mb-3 cursor-pointer group/photo"
+                        className="relative w-full h-44 rounded-lg overflow-hidden bg-zinc-800 mb-3 cursor-pointer group/photo"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedEventForGallery(event);
@@ -235,71 +235,78 @@ setRegisteredEvents(registeredIds);
                       </div>
                     )}
 
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-4">
-                      <div className="flex-1 w-full">
-                        <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
-                          <h3 className="text-base sm:text-lg font-bold">{event.title}</h3>
-                          {event.isPaid && (
-                            <Badge variant="info">💰 ₹{event.price.toFixed(2)}</Badge>
-                          )}
-                          {deadlinePassed && (
-                            <Badge variant="warning">Registration Closed</Badge>
-                          )}
-                          {isRegistered && (
-                            <Badge variant="success">✓ Registered</Badge>
-                          )}
-                        </div>
-                        <p className="text-zinc-300 text-xs sm:text-sm mb-3">
-                          {event.description}
-                        </p>
-                      </div>
+                    {/* Title & Badges */}
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <h3 className="text-base font-bold truncate">{event.title}</h3>
+                      {event.isPaid && (
+                        <Badge variant="info">💰 ₹{event.price.toFixed(2)}</Badge>
+                      )}
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm">
-                      <div>
-                        <p className="text-zinc-400">Event Date</p>
+                    {/* Status Badges */}
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      {deadlinePassed && (
+                        <Badge variant="warning">Registration Closed</Badge>
+                      )}
+                      {isRegistered && (
+                        <Badge variant="success">✓ Registered</Badge>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-zinc-300 text-xs mb-3 line-clamp-2">
+                      {event.description}
+                    </p>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                      <div className="bg-zinc-800/50 rounded-lg p-2">
+                        <p className="text-zinc-500">Event Date</p>
                         <p className="text-white font-semibold">
                           {eventDate.toLocaleDateString()}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-zinc-400">Deadline</p>
+                      <div className="bg-zinc-800/50 rounded-lg p-2">
+                        <p className="text-zinc-500">Deadline</p>
                         <p className="text-white font-semibold">
                           {deadlineDate.toLocaleDateString()}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-zinc-400">Registrations</p>
+                      <div className="bg-zinc-800/50 rounded-lg p-2">
+                        <p className="text-zinc-500">Registrations</p>
                         <p className="text-white font-semibold">
                           {event.participants.length}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-zinc-400">Organized by</p>
-                        <p className="text-white font-semibold">
+                      <div className="bg-zinc-800/50 rounded-lg p-2">
+                        <p className="text-zinc-500">Organized by</p>
+                        <p className="text-white font-semibold truncate">
                           {event.createdBy.name || "Unknown"}
                         </p>
                       </div>
                     </div>
 
-                    {!isRegistered && !deadlinePassed && (
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRegisterEvent(event._id);
-                        }}
-                        disabled={registering === event._id}
-                        className="w-full text-xs sm:text-sm"
-                      >
-                        {registering === event._id
-                          ? (event.isPaid ? "Processing Payment..." : "Registering...")
-                          : event.isPaid
-                          ? `Pay & Register - ₹${event.price.toFixed(2)}`
-                          : "Register for Free"}
-                      </Button>
-                    )}
+                    {/* Register Button - pushed to bottom */}
+                    <div className="mt-auto">
+                      {!isRegistered && !deadlinePassed && (
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRegisterEvent(event._id);
+                          }}
+                          disabled={registering === event._id}
+                          className="w-full text-xs"
+                        >
+                          {registering === event._id
+                            ? (event.isPaid ? "Processing..." : "Registering...")
+                            : event.isPaid
+                            ? `Pay & Register - ₹${event.price.toFixed(2)}`
+                            : "Register for Free"}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </Card>
               </div>
