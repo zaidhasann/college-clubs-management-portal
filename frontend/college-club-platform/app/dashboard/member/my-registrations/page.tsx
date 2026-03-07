@@ -22,6 +22,8 @@ interface Registration {
     createdBy?: { name: string; email: string } | null;
   } | null;
   status: "registered" | "attended" | "cancelled";
+  isCheckedIn: boolean;
+  checkedInAt?: string;
   registeredAt: string;
 }
 
@@ -139,7 +141,11 @@ export default function MyRegistrationsPage() {
                         </p>
                       </div>
 
-                      <Badge variant="success">✓ Registered</Badge>
+                      {registration.status === "attended" || registration.isCheckedIn ? (
+                        <Badge variant="success">✓ Attended</Badge>
+                      ) : (
+                        <Badge variant="info">📋 Registered</Badge>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-3 gap-4 text-sm">
@@ -231,11 +237,15 @@ export default function MyRegistrationsPage() {
                       </div>
 
                       <div>
-                        <p className="text-zinc-400">Attended</p>
-                        <p className="font-semibold">
-                          {registration.status === "attended"
-                            ? "Yes"
-                            : "Not marked"}
+                        <p className="text-zinc-400">Attendance</p>
+                        <p className={`font-semibold ${
+                          registration.status === "attended" || registration.isCheckedIn
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}>
+                          {registration.status === "attended" || registration.isCheckedIn
+                            ? "✓ Attended"
+                            : "✗ Absent"}
                         </p>
                       </div>
 

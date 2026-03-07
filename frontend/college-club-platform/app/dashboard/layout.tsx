@@ -28,6 +28,7 @@ export default function DashboardLayout({
     { name: "Users", href: "/dashboard/admin/users", icon: "👥" },
     { name: "Clubs", href: "/dashboard/admin/clubs", icon: "🏢" },
     { name: "Events", href: "/dashboard/admin/events", icon: "📅" },
+    { name: "Attendance", href: "/dashboard/admin/attendance", icon: "✔️" },
     { name: "Chat", href: "/dashboard/admin/chat", icon: "💬" },
     { name: "Settings", href: "/dashboard/admin/settings", icon: "⚙️" },
   ];

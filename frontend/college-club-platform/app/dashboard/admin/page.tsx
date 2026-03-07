@@ -62,7 +62,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Members"
-          value={totalMembers_count.toString()}
+          value={totalMembers.toString()}
           subtitle="Registered users"
         />
         <StatCard

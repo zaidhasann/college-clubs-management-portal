@@ -222,3 +222,20 @@ export const chatAPI = {
       method: "DELETE",
     }),
 };
+
+// Attendance API
+export const attendanceAPI = {
+  checkIn: (eventId: string, userId: string) =>
+    apiRequest(`/attendance/${eventId}/checkin`, {
+      method: "POST",
+      body: JSON.stringify({ userId }),
+    }),
+  getAttendance: (eventId: string) =>
+    apiRequest(`/attendance/${eventId}`),
+  getStats: (eventId: string) =>
+    apiRequest(`/attendance/${eventId}/stats`),
+  removeCheckIn: (eventId: string, userId: string) =>
+    apiRequest(`/attendance/${eventId}/checkin/${userId}`, {
+      method: "DELETE",
+    }),
+};

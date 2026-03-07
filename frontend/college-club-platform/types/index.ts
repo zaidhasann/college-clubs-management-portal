@@ -5,6 +5,7 @@ export interface Event {
   date: string;
   status: "upcoming" | "completed";
   registrationsCount: number;
+  attendanceCount?: number;
   mainPhoto?: string;
   photos?: string[];
   club?: {
@@ -13,6 +14,7 @@ export interface Event {
     description: string;
   };
   participants?: string[];
+  attendance?: string[];
 }
 
 export interface Club {

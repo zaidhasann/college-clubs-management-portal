@@ -12,6 +12,8 @@ export interface IEvent extends Document {
   status: "upcoming" | "completed";
   registrationsCount: number;
   participants: mongoose.Types.ObjectId[];
+  attendance: mongoose.Types.ObjectId[];
+  attendanceCount: number;
   mainPhoto?: string;
   photos: string[];
   createdAt: Date;
@@ -30,6 +32,8 @@ const EventSchema = new Schema<IEvent>(
     status: { type: String, enum: ["upcoming", "completed"], default: "upcoming" },
     registrationsCount: { type: Number, default: 0 },
     participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    attendance: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    attendanceCount: { type: Number, default: 0 },
     mainPhoto: { type: String },
     photos: [{ type: String }],
   },

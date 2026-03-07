@@ -10,6 +10,7 @@ import userRoutes from "./routes/users";
 import adminRequestRoutes from "./routes/adminRequest";
 import paymentRoutes from "./routes/payment";
 import chatRoutes from "./routes/chat";
+import attendanceRoutes from "./routes/attendance";
 import { setupSocket } from "./socket";
 
 dotenv.config();
@@ -38,6 +39,7 @@ app.use("/api/clubs", clubRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 // Start server and connect to database
 const startServer = async () => {
