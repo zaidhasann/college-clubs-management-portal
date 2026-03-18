@@ -1,16 +1,12 @@
-const express = require("express");
+import express, { Request, Response } from "express";
+
 const router = express.Router();
 
-router.post("/scan", async (req, res) => {
+router.post("/scan", async (req: Request, res: Response) => {
 
     const { qrData } = req.body;
 
     console.log("QR received:", qrData);
-
-    // Example QR data
-    // { userId: "123", eventId: "abc" }
-
-    // mark attendance in DB
 
     res.json({
         success: true,
@@ -19,4 +15,4 @@ router.post("/scan", async (req, res) => {
 
 });
 
-module.exports = router;
+export default router;
