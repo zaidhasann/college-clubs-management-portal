@@ -100,10 +100,10 @@ export const eventsAPI = {
   getAll: () => apiRequest("/events"),
   getMyEvents: () => apiRequest("/events/my-events"),
   getById: (id: string) => apiRequest(`/events/${id}`),
-  create: (title: string, description: string, date: string, deadline: string, isPaid: boolean, price?: number) =>
+  create: (title: string, description: string, date: string, deadline: string, isPaid: boolean, price?: number, capacity?: number) =>
     apiRequest("/events", {
       method: "POST",
-      body: JSON.stringify({ title, description, date, deadline, isPaid, price: isPaid ? price : 0 }),
+      body: JSON.stringify({ title, description, date, deadline, isPaid, price: isPaid ? price : 0, capacity }),
     }),
   update: (id: string, data: any) =>
     apiRequest(`/events/${id}`, {

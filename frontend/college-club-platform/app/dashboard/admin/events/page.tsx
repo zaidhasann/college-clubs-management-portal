@@ -87,10 +87,11 @@ export default function AdminEventsPage() {
       setError("Price must be greater than 0 for paid events");
       return;
     }
+
     if (!formData.capacity || formData.capacity <= 0) {
-  setError("Capacity must be greater than 0");
-  return;
-}
+      setError("Capacity must be greater than 0");
+      return;
+    }
 
     try {
       setError("");

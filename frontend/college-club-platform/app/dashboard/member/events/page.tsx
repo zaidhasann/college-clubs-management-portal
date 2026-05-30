@@ -44,11 +44,10 @@ export default function MemberEventsPage() {
 
        const registrations = await eventsAPI.getUserRegistrations();
 
-const registeredIds = registrations
-  .filter((reg: any) => reg.event && reg.event._id)
-  .map((reg: any) => reg.event._id);
+        const registeredIds = registrations
+          .filter((reg: any) => reg.event && reg.event._id)
+          .map((reg: any) => reg.event._id);
 
-setRegisteredEvents(registeredIds);
         setRegisteredEvents(registeredIds);
       } catch (err) {
         setError((err as Error).message || "Failed to load events");

@@ -85,7 +85,7 @@ export default function EventCard({ event }: EventCardProps) {
             </span>
 
             <span className="text-xs text-zinc-500">
-              {event.registrationsCount} registrations
+              {event.participants?.length || 0} registrations
             </span>
           </div>
         </div>
