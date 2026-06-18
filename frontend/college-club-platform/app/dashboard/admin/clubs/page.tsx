@@ -390,8 +390,8 @@ export default function AdminClubsPage() {
                 {joinRequests.map((request) => (
                   <Card key={request._id} className="flex justify-between items-center">
                     <div>
-                      <p className="font-semibold">{request.userId.name}</p>
-                      <p className="text-sm text-zinc-400">{request.userId.email}</p>
+                      <p className="font-semibold">{request.userId?.name || "Unknown User"}</p>
+                      <p className="text-sm text-zinc-400">{request.userId?.email || "N/A"}</p>
                       <p className="text-xs text-zinc-500 mt-1">
                         Requested {new Date(request.requestedAt).toLocaleDateString()}
                       </p>

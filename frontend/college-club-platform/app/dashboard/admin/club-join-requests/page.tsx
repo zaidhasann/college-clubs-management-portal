@@ -12,11 +12,11 @@ import EmptyState from "@/components/ui/EmptyState";
 
 interface ClubJoinRequest {
   _id: string;
-  userId: {
+  userId?: {
     _id: string;
     name: string;
     email: string;
-  };
+  } | null;
   clubId: string;
   status: "pending" | "approved" | "rejected";
   requestedAt: string;
@@ -24,7 +24,7 @@ interface ClubJoinRequest {
   approvedBy?: {
     _id: string;
     name: string;
-  };
+  } | null;
 }
 
 interface Club {
@@ -215,7 +215,7 @@ export default function ClubJoinRequestsPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="text-lg font-semibold text-white">
-                      {request.userId.name}
+                      {request.userId?.name || "Unknown User"}
                     </h3>
                     <Badge
                       variant={
@@ -229,7 +229,7 @@ export default function ClubJoinRequestsPage() {
                       {request.status}
                     </Badge>
                   </div>
-                  <p className="text-sm text-zinc-400 mb-1">{request.userId.email}</p>
+                  <p className="text-sm text-zinc-400 mb-1">{request.userId?.email || "N/A"}</p>
                   <p className="text-xs text-zinc-500">
                     Requested on{" "}
                     {new Date(request.requestedAt).toLocaleDateString()}{" "}
@@ -259,7 +259,7 @@ export default function ClubJoinRequestsPage() {
                 {request.status === "approved" && request.approvedBy && (
                   <div className="text-right">
                     <p className="text-xs text-green-400">
-                      Approved by {request.approvedBy.name}
+                      Approved by {request.approvedBy?.name || "Admin"}
                     </p>
                     <p className="text-xs text-zinc-500">
                       {new Date(request.approvedAt || "").toLocaleDateString()}

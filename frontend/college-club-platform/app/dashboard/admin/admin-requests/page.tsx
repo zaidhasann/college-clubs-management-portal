@@ -10,11 +10,11 @@ import Card from "@/components/ui/Card";
 
 interface AdminRequest {
   _id: string;
-  userId: {
+  userId?: {
     _id: string;
     name: string;
     email: string;
-  };
+  } | null;
   name: string;
   email: string;
   reason: string;
@@ -24,7 +24,7 @@ interface AdminRequest {
   approvedBy?: {
     _id: string;
     name: string;
-  };
+  } | null;
 }
 
 export default function AdminRequestsPage() {
