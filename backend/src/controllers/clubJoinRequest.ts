@@ -116,10 +116,12 @@ export const approveClubJoinRequest = async (req: AuthRequest, res: Response) =>
       await user.save();
     }
 
-    await joinRequest.populate("userId", "name email");
-    await joinRequest.populate("approvedBy", "name email");
+    // Fetch populated request
+    const populatedRequest = await ClubJoinRequest.findById(joinRequest._id)
+      .populate("userId", "name email")
+      .populate("approvedBy", "name email");
 
-    res.json({ message: "Join request approved", joinRequest });
+    res.json({ message: "Join request approved", joinRequest: populatedRequest });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
@@ -159,13 +161,15 @@ export const rejectClubJoinRequest = async (req: AuthRequest, res: Response) => 
       club.pendingMembers = club.pendingMembers.filter(
         (id) => id.toString() !== joinRequest.userId.toString()
       );
-      await club.save();
     }
+    await club.save();
 
-    await joinRequest.populate("userId", "name email");
-    await joinRequest.populate("approvedBy", "name email");
+    // Fetch populated request
+    const populatedRequest = await ClubJoinRequest.findById(joinRequest._id)
+      .populate("userId", "name email")
+      .populate("approvedBy", "name email");
 
-    res.json({ message: "Join request rejected", joinRequest });
+    res.json({ message: "Join request rejected", joinRequest: populatedRequest });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
