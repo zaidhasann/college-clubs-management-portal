@@ -25,17 +25,31 @@ async function apiRequest(
     Object.assign(headers, { Authorization: `Bearer ${token}` });
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "API request failed");
+    if (!response.ok) {
+      let errorMessage = "API request failed";
+      try {
+        const error = await response.json();
+        errorMessage = error.error || error.message || errorMessage;
+      } catch {
+        errorMessage = `Server error (${response.status})`;
+      }
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  } catch (error) {
+    // Handle network errors
+    if (error instanceof TypeError) {
+      throw new Error("Network error - unable to reach server");
+    }
+    throw error;
   }
-
-  return response.json();
 }
 
 // Auth API
