@@ -29,12 +29,12 @@ clubManagement/
 
 ### 1. Set up MongoDB
 
-**Option A: Docker (Recommended)**
+**Option A: Docker 
 ```bash
 docker-compose up -d
 ```
 
-**Option B: MongoDB Atlas (Cloud)**
+**Option B: MongoDB Atlas (Recommended)**
 - Create account at https://www.mongodb.com/cloud/atlas
 - Create a free tier cluster
 - Get your connection string
@@ -115,8 +115,8 @@ Frontend runs at: `http://localhost:3000`
 - ✅ Protected Routes
 - ✅ Role-based Access Control
 
-## Environment Variables
 
+### Example Backend Environment Variables
 ### Backend (`backend/.env`)
 ```
 PORT=5000
@@ -164,5 +164,4 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 - [ ] Create event details page with registration
 - [ ] Add more admin controls
 - [ ] Implement email notifications
-- [ ] Add search and filters
-- [ ] Deploy to production
+
