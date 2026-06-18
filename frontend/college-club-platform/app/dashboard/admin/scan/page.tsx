@@ -76,7 +76,17 @@ export default function ScanPage() {
       setError(null);
       setAttendanceCount(result.attendanceCount);
 
-      // Allow scanning another after 2 seconds
+      // Stop scanner briefly to prevent duplicate scans
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch (err) {
+          console.debug("Error stopping scanner:", err);
+        }
+      }
+      setScanning(false);
+
+      // Restart after 2 seconds
       setTimeout(() => {
         setResult(null);
         startScanning();
@@ -85,8 +95,18 @@ export default function ScanPage() {
       const errorMsg = error.message || "Check-in failed";
       setError(`✗ ${errorMsg}`);
       setResult(null);
-      
-      // Allow retry after 2 seconds
+
+      // Stop scanner briefly
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch (err) {
+          console.debug("Error stopping scanner:", err);
+        }
+      }
+      setScanning(false);
+
+      // Retry after 2 seconds
       setTimeout(() => {
         setError(null);
         startScanning();
@@ -101,8 +121,32 @@ export default function ScanPage() {
     }
 
     try {
+      setError(null);
+      setResult(null);
+      
+      // Stop any existing scanner first
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch (err) {
+          console.debug("Error stopping previous scanner:", err);
+        }
+      }
+
+      // Set scanning BEFORE creating scanner so div is visible
+      setScanning(true);
+
+      // Give the DOM a moment to render the div
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       // Dynamic import to avoid SSR issues
       const { Html5Qrcode } = await import("html5-qrcode");
+
+      // Check if div exists
+      const readerDiv = document.getElementById("reader");
+      if (!readerDiv) {
+        throw new Error("Scanner container not found in DOM");
+      }
 
       const scanner = new Html5Qrcode("reader");
       scannerRef.current = scanner;
@@ -118,13 +162,20 @@ export default function ScanPage() {
           // QR parse error on each frame — ignore silently
         }
       );
-
-      setScanning(true);
-      setError(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error starting scanner:", err);
-      setError("Could not start camera. Please allow camera access.");
       setScanning(false);
+      const errorMsg = err.message || "Could not start camera";
+      
+      if (errorMsg.includes("NotAllowedError")) {
+        setError("Camera access denied. Please allow camera access in browser settings.");
+      } else if (errorMsg.includes("NotFoundError")) {
+        setError("No camera found on this device.");
+      } else if (errorMsg.includes("NotSupportedError")) {
+        setError("Your browser doesn't support camera access.");
+      } else {
+        setError(`Camera error: ${errorMsg}`);
+      }
     }
   };
 
@@ -246,7 +297,8 @@ export default function ScanPage() {
 
           <div
             id="reader"
-            className={`${scanning ? "block" : "hidden"} bg-black rounded-lg overflow-hidden`}
+            className={`${scanning ? "block" : "hidden"} w-full max-w-md mx-auto bg-black rounded-lg overflow-hidden`}
+            style={{ minHeight: "300px", aspectRatio: "1" }}
           ></div>
 
           {!scanning && (
