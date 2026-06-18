@@ -29,12 +29,12 @@ clubManagement/
 
 ### 1. Set up MongoDB
 
-**Option A: Docker (Recommended)**
+**Option A: Docker 
 ```bash
 docker-compose up -d
 ```
 
-**Option B: MongoDB Atlas (Cloud)**
+**Option B: MongoDB Atlas (Recommended)**
 - Create account at https://www.mongodb.com/cloud/atlas
 - Create a free tier cluster
 - Get your connection string
