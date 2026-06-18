@@ -115,8 +115,8 @@ Frontend runs at: `http://localhost:3000`
 - ✅ Protected Routes
 - ✅ Role-based Access Control
 
-## Environment Variables
 
+### Example Backend Environment Variables
 ### Backend (`backend/.env`)
 ```
 PORT=5000
@@ -164,5 +164,4 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 - [ ] Create event details page with registration
 - [ ] Add more admin controls
 - [ ] Implement email notifications
-- [ ] Add search and filters
-- [ ] Deploy to production
+
