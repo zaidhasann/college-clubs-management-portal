@@ -239,10 +239,14 @@ export const chatAPI = {
 
 // Attendance API
 export const attendanceAPI = {
-  checkIn: (eventId: string, userId: string) =>
+  checkIn: (eventId: string, userIdOrQrCode: string, isQrCode: boolean = false) =>
     apiRequest(`/attendance/${eventId}/checkin`, {
       method: "POST",
-      body: JSON.stringify({ userId }),
+      body: JSON.stringify(
+        isQrCode 
+          ? { qrCode: userIdOrQrCode }
+          : { userId: userIdOrQrCode }
+      ),
     }),
   getAttendance: (eventId: string) =>
     apiRequest(`/attendance/${eventId}`),

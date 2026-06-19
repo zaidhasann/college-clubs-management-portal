@@ -67,10 +67,11 @@ export default function ScanPage() {
     if (!selectedEvent) return;
 
     try {
-      // The QR code should contain the user ID
-      const userId = decodedText.trim();
+      // The QR code contains the unique registration QR code string
+      const qrCode = decodedText.trim();
 
-      const result = await attendanceAPI.checkIn(selectedEvent._id, userId);
+      // Call checkIn with QR code (isQrCode=true)
+      const result = await attendanceAPI.checkIn(selectedEvent._id, qrCode, true);
 
       setResult(`✓ ${result.user.name} checked in successfully!`);
       setError(null);

@@ -7,7 +7,7 @@ import User from "../models/User";
 export const checkIn = async (req: Request, res: Response) => {
   try {
     const { eventId } = req.params;
-    const { userId } = req.body;
+    const { userId, qrCode } = req.body;
 
     // Validate event exists
     const event = await Event.findById(eventId);
@@ -15,32 +15,53 @@ export const checkIn = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Validate user exists
-    const user = await User.findById(userId);
+    let registration;
+    let user;
+
+    // Check-in by QR code (from scanner) or by userId (from attendance page)
+    if (qrCode) {
+      // Find registration by QR code
+      registration = await Registration.findOne({ qrCode }).populate("user");
+      
+      if (!registration) {
+        return res.status(404).json({ message: "QR code not found" });
+      }
+
+      if (registration.event.toString() !== eventId) {
+        return res.status(400).json({ message: "QR code is for a different event" });
+      }
+
+      user = registration.user as any;
+    } else if (userId) {
+      // Find registration by user ID
+      registration = await Registration.findOne({
+        event: eventId,
+        user: userId,
+        status: { $ne: "cancelled" },
+      }).populate("user");
+
+      if (!registration) {
+        return res.status(400).json({ message: "User is not registered for this event" });
+      }
+
+      user = registration.user as any;
+    } else {
+      return res.status(400).json({ message: "QR code or user ID required" });
+    }
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if user is registered for this event
-    const registration = await Registration.findOne({
-      event: eventId,
-      user: userId,
-      status: { $ne: "cancelled" }, // Not cancelled
-    });
-
-    if (!registration) {
-      return res
-        .status(400)
-        .json({ message: "User is not registered for this event" });
-    }
-
-    // Check if user already checked in
-    if (event.attendance.includes(userId as any)) {
+    // Check if already checked in
+    if (registration.isCheckedIn) {
       return res.status(400).json({ message: "User already checked in" });
     }
 
-    // Add user to attendance
-    event.attendance.push(userId as any);
+    // Add user to event attendance if not already there
+    if (!event.attendance.includes(user._id as any)) {
+      event.attendance.push(user._id as any);
+    }
     event.attendanceCount = event.attendance.length;
     await event.save();
 
@@ -61,7 +82,7 @@ export const checkIn = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error during check-in:", error);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error: " + (error as Error).message });
   }
 };
 
