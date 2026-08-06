@@ -165,3 +165,36 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 - [ ] Add more admin controls
 - [ ] Implement email notifications
 
+## Deployment (Render)
+
+This project is ready to deploy to Render (or a similar host). Key points:
+
+- Backend default production URL (example): `https://college-clubs-management-portal-3.onrender.com`
+- Frontend default production URL (example): `https://clubmanchh.onrender.com`
+
+Recommended steps to deploy:
+
+1. Create two services on Render (or your host): one for the backend, one for the frontend.
+
+2. Backend environment variables (set these in the Render dashboard, do NOT commit `.env`):
+
+    - `PORT=5000`
+    - `MONGODB_URI` = your Atlas connection string (include DB name, do NOT include in git)
+    - `JWT_SECRET` = a strong secret
+    - `FRONTEND_URL` = https://clubmanchh.onrender.com
+    - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` (if using payments)
+
+3. Frontend environment variables (set in Render):
+
+    - `NEXT_PUBLIC_API_URL` = https://college-clubs-management-portal-3.onrender.com/api
+
+4. Ensure `.gitignore` excludes `.env` files (this repo already ignores `.env`). Use the provided `.env.example` files as reference.
+
+5. When creating the Render services, point them to the respective folders in this repo:
+    - Backend: `backend/` (start command: `npm run build` then `npm start` or `npm run dev` for staging)
+    - Frontend: `frontend/college-club-platform/` (start command: `npm run build` then `npm start`)
+
+6. After deploy, test the site by visiting your frontend URL and ensuring API calls are routed to the backend URL.
+
+Security note: rotate any credentials that were exposed in prior commits or messages. Use Render's secret environment settings instead of committing secrets to the repository.
+

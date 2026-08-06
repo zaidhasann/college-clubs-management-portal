@@ -7,7 +7,6 @@ import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Card from "@/components/ui/Card";
-import Logo from "@/components/ui/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,8 +22,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      router.push("/dashboard/member");
+      const loggedInUser = await login(email, password);
+      if (loggedInUser?.role === "admin") {
+        router.push("/dashboard/admin");
+      } else if (loggedInUser?.role === "pending_admin") {
+        router.push("/pending-approval");
+      } else {
+        router.push("/dashboard/member");
+      }
     } catch (err) {
       setError((err as Error).message || "Login failed");
     } finally {
@@ -37,7 +42,6 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <div className="space-y-6">
           <div className="text-center">
-            <Logo variant="full" className="justify-center mb-4" />
             <h2 className="text-2xl text-white font-bold">Welcome Back</h2>
             <p className="text-zinc-400 text-sm mt-1">Sign in to your account</p>
           </div>

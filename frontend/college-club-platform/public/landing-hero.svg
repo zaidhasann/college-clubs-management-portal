@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="50%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#ef4444" />
+    </linearGradient>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2a0938" />
+      <stop offset="100%" stop-color="#1b0b1a" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#sky)" />
+
+  <!-- stylized campus silhouette -->
+  <g transform="translate(0,220)">
+    <rect x="60" y="220" width="360" height="160" rx="8" fill="#0f1724" opacity="0.9" />
+    <rect x="140" y="140" width="220" height="240" rx="12" fill="#111827" opacity="0.9" />
+    <rect x="420" y="200" width="380" height="180" rx="10" fill="#0b1220" opacity="0.9" />
+    <rect x="820" y="160" width="260" height="220" rx="10" fill="#071024" opacity="0.9" />
+  </g>
+
+  <!-- tents and people (simple shapes) -->
+  <g fill="url(#g)" opacity="0.9">
+    <ellipse cx="900" cy="600" rx="160" ry="40" fill="#0b1220" opacity="0.5" />
+    <circle cx="740" cy="540" r="28" fill="#7c3aed" />
+    <circle cx="800" cy="560" r="22" fill="#ef4444" />
+    <circle cx="860" cy="520" r="26" fill="#3b82f6" />
+  </g>
+
+  <!-- foreground banners -->
+  <g>
+    <rect x="500" y="110" width="320" height="60" rx="8" fill="#26102b" opacity="0.8" />
+    <text x="660" y="150" font-family="sans-serif" font-size="20" text-anchor="middle" fill="#ffb4c6">TOGETHER WE BUILD COMMUNITIES</text>
+  </g>
+
+  <!-- subtle glow -->
+  <rect x="0" y="0" width="1200" height="800" fill="rgba(255,0,0,0.03)" />
+</svg>

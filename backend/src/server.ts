@@ -19,14 +19,25 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://clubmanchh.onrender.com'
-  ],
-  credentials: true
-}));
+// Middleware: configure CORS origins from environment for deployment-ready behavior
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'https://clubmanchh.onrender.com',
+  'http://localhost:3000',
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+      return callback(new Error('CORS policy: origin not allowed'), false);
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Health check

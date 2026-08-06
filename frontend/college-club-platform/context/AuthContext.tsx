@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { authAPI } from "@/lib/api";
 
 interface User {
@@ -14,14 +15,15 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, registerAs: "member" | "admin", reason?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (name: string, email: string, password: string, registerAs: "member" | "admin", reason?: string) => Promise<User>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response.user);
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
+      return response.user;
     } catch (error) {
       throw error;
     }
@@ -57,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response.user);
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
+      return response.user;
     } catch (error) {
       throw error;
     }
@@ -67,6 +71,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    // Redirect to landing page after logout
+    try {
+      router.push("/");
+    } catch (e) {
+      // ignore when router isn't available
+    }
   };
 
   return (

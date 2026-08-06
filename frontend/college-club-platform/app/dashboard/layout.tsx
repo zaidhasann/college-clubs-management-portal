@@ -139,7 +139,7 @@ export default function DashboardLayout({
                 href={link.href}
                 className={`px-4 py-2 rounded-lg transition flex items-center gap-3 relative ${
                   isActive
-                    ? "bg-blue-600 text-white font-semibold"
+                    ? "bg-gradient-to-r from-[#7c3aed] to-[#ef4444] text-white font-semibold shadow-[0_6px_20px_rgba(124,58,237,0.12)]"
                     : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
                 }`}
               >
@@ -217,7 +217,7 @@ export default function DashboardLayout({
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition text-sm relative ${
                     isActive
-                      ? "bg-blue-600 text-white font-semibold"
+                      ? "bg-gradient-to-r from-[#7c3aed] to-[#ef4444] text-white font-semibold"
                       : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
                   }`}
                 >
