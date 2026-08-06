@@ -25,14 +25,30 @@ const allowedOrigins = [
   'http://localhost:3000',
 ];
 
+// Log allowed origins for debugging deployed CORS issues
+console.log('Allowed CORS origins:', allowedOrigins);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl)
+      // Allow requests with no origin (like curl, Postman, or same-origin server-to-server)
       if (!origin) return callback(null, true);
+
+      // Exact match against configured allowed origins
       if (allowedOrigins.indexOf(origin) !== -1) {
         return callback(null, true);
       }
+
+      // Allow any Render-hosted frontend subdomain (e.g. https://*.onrender.com)
+      try {
+        if (origin.endsWith('.onrender.com')) {
+          return callback(null, true);
+        }
+      } catch (e) {
+        /* ignore */
+      }
+
+      // Not allowed
       return callback(new Error('CORS policy: origin not allowed'), false);
     },
     credentials: true,
